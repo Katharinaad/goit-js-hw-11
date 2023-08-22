@@ -29,7 +29,7 @@ axios.defaults.baseURL = 'https://pixabay.com/api/';
 const serviceImages = async value => {
   const { data } = await axios({
     params: {
-      key: KEY,
+      key: API_KEY,
       q: value,
       image_type: 'photo',
       orientation: 'horizontal',
