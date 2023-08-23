@@ -67,10 +67,11 @@ async function onBtnLoadMoreClick() {
     // if (page === pagesAmount) {
     //   hideBtn();
     // }
-    if (page > 1 && page > pagesAmount) {
-      Notify.info("We're sorry, but you've reached the end of search results.");
-      hideBtn();
-    } else {
+    // if (page > 1 && page > pagesAmount) {
+    //   Notify.info("We're sorry, but you've reached the end of search results.");
+    //   hideBtn();
+    // }
+    else {
       showLoader();
       const data = await searchImg(page, searchQuery);
       const pictures = data.hits;
