@@ -5,26 +5,28 @@ import Notiflix from 'notiflix';
 const API_KEY = '38980097-7acd167c88be026b0eb497bb1';
 // const BASE_URL = 'https://pixabay.com/api/';
 
-const pageLimit = 40;
+//const pageLimit = 40;
 
-axios.defaults.baseURL = 'https://pixabay.com/api/';
+// axios.defaults.baseURL = 'https://pixabay.com/api/';
 
-const fetchImages = async (queryToFetch, pageToFetch) => {
-  const { data } = await axios({
-    params: {
-      key: API_KEY,
-      q: queryToFetch,
-      image_type: 'photo',
-      orientation: 'horizontal',
-      safesearch: true,
-      per_page: pageLimit,
-      page: pageToFetch,
-    },
-  });
-  return data;
-};
+async function searchImg(page, searchQuery) {
+  const params = {
+    key: API_KEY,
+    q: searchQuery,
+    image_type: 'photo',
+    orientation: 'horizontal',
+    safesearch: true,
+    per_page: 40,
+    page: page,
+  };
+  const searchParams = new URLSearchParams(params);
+  const response = await axios.get(
+    `https://pixabay.com/api/?${searchParams.toString()}`
+  );
+  return response.data;
+}
 
-export { fetchImages, pageLimit };
+export { searchImg };
 
 // // function serviceImages(value) {
 // //   const params = new URLSearchParams({
