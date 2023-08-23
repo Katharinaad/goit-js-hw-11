@@ -68,6 +68,7 @@ async function onBtnLoadMoreClick() {
     else {
       const data = await searchImg(page, searchQuery);
       const pictures = data.hits;
+
       page += 1;
       const galleryMarkup = createMarkup(pictures);
       gallery.insertAdjacentHTML('beforeend', galleryMarkup);
@@ -120,34 +121,12 @@ function hideBtn() {
   }
 }
 
-if (page >= pagesAmount) {
-  hideBtn();
-  Notiflix.Notify.info(
-    "We're sorry, but you've reached the end of search results."
-  );
-}
-
-//  async function onBtnLoadMoreClick() {
-//    page += 1;
-
-//    try {
-//      let searchQuery = input.value.trim();
-//      if (!searchQuery || !page) {
-//        return;
-//      }
-//      // if (page === pagesAmount) {
-//      //       hideBtn();
-//      //   }
-//      else {
-//        const data = await searchImg(page, searchQuery);
-//        const pictures = data.hits;
-//        const galleryMarkup = createMarkup(pictures);
-//        gallery.insertAdjacentHTML('beforeend', galleryMarkup);
-//      }
-//    } catch (error) {
-//      console.log(error);
-//    }
-//  }
+// if (page >= pagesAmount) {
+//   hideBtn();
+//   Notiflix.Notify.info(
+//     "We're sorry, but you've reached the end of search results."
+//   );
+// }
 
 function endOfSearch() {
   Notify.info("We're sorry, but you've reached the end of search results.");
