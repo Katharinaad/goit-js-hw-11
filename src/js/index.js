@@ -112,12 +112,3 @@ function hideBtn() {
     loadMoreBtn.classList.add('is-hidden');
   }
 }
-
-// Functions for loader
-function showLoader() {
-  document.querySelector('.loader').classList.remove('is-hidden');
-}
-
-function hideLoader() {
-  document.querySelector('.loader').classList.add('is-hidden');
-}
