@@ -54,7 +54,7 @@ async function onFormSubmit(event) {
     Notiflix.Notify.failure('Oops! Something went wrong!');
   }
 }
-//-----------------------------
+//-------------------------------
 
 async function onBtnLoadMoreClick() {
   try {
@@ -62,17 +62,19 @@ async function onBtnLoadMoreClick() {
     if (!searchQuery || !page) {
       return;
     }
-    if (page > pagesAmount) {
-      Notiflix.Notify.info(
-        "We're sorry, but you've reached the end of search results."
-      );
-      hideBtn();
-    } else {
+    // if (page >= pagesAmount) {
+    //   hideBtn();
+    // }
+    else {
       const data = await searchImg(page, searchQuery);
       const pictures = data.hits;
       page += 1;
       const galleryMarkup = createMarkup(pictures);
       gallery.insertAdjacentHTML('beforeend', galleryMarkup);
+    }
+    if (page > 1 && page > pagesAmount) {
+      endOfSearch();
+      hideBtn();
     }
   } catch (error) {
     console.log(error);
@@ -116,4 +118,37 @@ function hideBtn() {
   if (!loadMoreBtn.classList.contains('is-hidden')) {
     loadMoreBtn.classList.add('is-hidden');
   }
+}
+
+if (page >= pagesAmount) {
+  hideBtn();
+  Notiflix.Notify.info(
+    "We're sorry, but you've reached the end of search results."
+  );
+}
+
+//  async function onBtnLoadMoreClick() {
+//    page += 1;
+
+//    try {
+//      let searchQuery = input.value.trim();
+//      if (!searchQuery || !page) {
+//        return;
+//      }
+//      // if (page === pagesAmount) {
+//      //       hideBtn();
+//      //   }
+//      else {
+//        const data = await searchImg(page, searchQuery);
+//        const pictures = data.hits;
+//        const galleryMarkup = createMarkup(pictures);
+//        gallery.insertAdjacentHTML('beforeend', galleryMarkup);
+//      }
+//    } catch (error) {
+//      console.log(error);
+//    }
+//  }
+
+function endOfSearch() {
+  Notify.info("We're sorry, but you've reached the end of search results.");
 }
