@@ -12,7 +12,6 @@
       <div class="header-container container">
         <form class="search-form" id="search-form">
           <input
-            class="input"
             type="text"
             name="searchQuery"
             autocomplete="off"
@@ -22,12 +21,11 @@
         </form>
       </div>
     </header>
-    <main>
-      <div class="wrapper">
-        <div class="gallery"></div>
-        <button type="button" class="load-more unvisible">Load more</button>
-      </div>
-    </main>
+    <div class="gallery"></div>
+    <button type="button" class="load-more is-hidden">Load more</button>
+    <div class="backdrop is-hidden">
+      <div class="loader is-hidden"></div>
+    </div>
     <script type="module" src="./js/index.js"></script>
   </body>
 </html>
