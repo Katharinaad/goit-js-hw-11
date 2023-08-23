@@ -1,7 +1,7 @@
 import { searchImg } from './serviceImages';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import { Notify } from 'notiflix';
+import Notiflix, { Notify } from 'notiflix';
 
 let page;
 let pagesAmount;
@@ -26,19 +26,22 @@ const lightbox = new SimpleLightbox('.gallery a', {
 async function onFormSubmit(event) {
   event.preventDefault();
   hideBtn();
+
   page = 1;
   const searchQuery = form.elements.searchQuery.value;
   console.log(searchQuery);
   if (!searchQuery) {
-    Notify.info('Please, enter a query to search');
-    // cleanGallery();
+    Notiflix.Notify.info('Please, enter a query to search');
+    cleanGallery();
     return;
   }
   try {
     const data = await searchImg(page, searchQuery);
     const pictures = data.hits;
     pagesAmount = Math.ceil(data.totalHits / 40);
-
+    if (pictures.length === 0) {
+      nothingFound();
+    }
     if (pagesAmount > 1) {
       makeBtnVisible();
     }
@@ -48,6 +51,7 @@ async function onFormSubmit(event) {
     page += 1;
   } catch (error) {
     console.log(error);
+    Notiflix.Notify.failure('Oops! Something went wrong!');
   }
 }
 //-----------------------------
@@ -58,11 +62,12 @@ async function onBtnLoadMoreClick() {
     if (!searchQuery || !page) {
       return;
     }
-    // if (page > 1 && page > pagesAmount) {
-    //   Notify.info("We're sorry, but you've reached the end of search results.");
-    //   hideBtn();
-    // }
-    else {
+    if (page > pagesAmount) {
+      Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+      hideBtn();
+    } else {
       const data = await searchImg(page, searchQuery);
       const pictures = data.hits;
       page += 1;
@@ -95,7 +100,7 @@ function cleanGallery() {
 
 function nothingFound() {
   cleanGallery();
-  Notify.failure(
+  Notiflix.Notify.failure(
     'Sorry, there are no images matching your search query. Please try again.'
   );
   page = 1;
