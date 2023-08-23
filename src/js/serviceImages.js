@@ -7,8 +7,6 @@ const API_KEY = '38980097-7acd167c88be026b0eb497bb1';
 
 //const pageLimit = 40;
 
-// axios.defaults.baseURL = 'https://pixabay.com/api/';
-
 async function searchImg(page, searchQuery) {
   const params = {
     key: API_KEY,
