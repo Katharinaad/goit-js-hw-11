@@ -21,6 +21,7 @@ async function searchImg(page, searchQuery) {
   const response = await axios.get(
     `https://pixabay.com/api/?${searchParams.toString()}`
   );
+  console.log(response.data);
   return response.data;
 }
 
