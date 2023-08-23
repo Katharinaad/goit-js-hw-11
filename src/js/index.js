@@ -31,27 +31,21 @@ async function onFormSubmit(event) {
   console.log(searchQuery);
   if (!searchQuery) {
     Notify.info('Please, enter a query to search');
-    cleanGallery();
+    // cleanGallery();
     return;
   }
   try {
     const data = await searchImg(page, searchQuery);
     const pictures = data.hits;
     pagesAmount = Math.ceil(data.totalHits / 40);
-    if (pictures.length === 0) {
-      nothingFound();
-    } else {
-      //   if (page === 1) {
-      //     Notify.success(`Hooray! We found ${data.totalHits} images.`);
-      //   }
-      if (pagesAmount > 1) {
-        makeBtnVisible();
-      }
-      const galleryMarkup = createMarkup(pictures);
-      gallery.innerHTML = galleryMarkup;
 
-      page += 1;
+    if (pagesAmount > 1) {
+      makeBtnVisible();
     }
+    const galleryMarkup = createMarkup(pictures);
+    gallery.innerHTML = galleryMarkup;
+
+    page += 1;
   } catch (error) {
     console.log(error);
   }
@@ -64,21 +58,16 @@ async function onBtnLoadMoreClick() {
     if (!searchQuery || !page) {
       return;
     }
-    // if (page === pagesAmount) {
-    //   hideBtn();
-    // }
     // if (page > 1 && page > pagesAmount) {
     //   Notify.info("We're sorry, but you've reached the end of search results.");
     //   hideBtn();
     // }
     else {
-      showLoader();
       const data = await searchImg(page, searchQuery);
       const pictures = data.hits;
       page += 1;
       const galleryMarkup = createMarkup(pictures);
       gallery.insertAdjacentHTML('beforeend', galleryMarkup);
-      hideLoader();
     }
   } catch (error) {
     console.log(error);
