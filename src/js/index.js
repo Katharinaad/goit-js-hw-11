@@ -1,68 +1,133 @@
-import { getImages } from './getImages';
+import { searchImg } from './serviceImages';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import { Notify } from 'notiflix';
 
-let queryToFetch = '';
-let pageToFetch;
+let page;
+let pagesAmount;
 
-//Писання на елементи
-const formEl = document.querySelector('.search-form');
-const galleryEl = document.querySelector('.gallery');
-const buttonLoadMore = document.querySelector('.load-more');
+//elements
+const form = document.querySelector('#search-form');
+const input = form.elements[0];
+const gallery = document.querySelector('.gallery');
+const loadMoreBtn = document.querySelector('.load-more');
 
-//Створюємо слухачів подій на форму та кнопку
-formEl.addEventListener('submit', onSubmitForm);
-buttonLoadMore.addEventListener('click', onBtnLoadMoreClick);
+//add event listener to the button and to the form
+form.addEventListener('submit', onFormSubmit);
+loadMoreBtn.addEventListener('click', onBtnLoadMoreClick);
 
-//Ініціалізація біблітеки SimpleLightbox
+//SimpleLightbox
 const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
-  captionDelay: 250,
+  captionDelay: 200,
 });
 
-//Функція-хендлер, що відбувається при сабміті фотми (фетч + рендер галереї)
-function onSubmitForm(event) {
+//function while submitting the form
+async function onFormSubmit(event) {
   event.preventDefault();
-  const query = event.currentTarget.elements.searchQuery.value;
-  if (!query.trim() || query === queryToFetch) {
+  hideBtn();
+  page = 1;
+  const searchQuery = form.elements.searchQuery.value;
+  console.log(searchQuery);
+  if (!searchQuery) {
+    Notify.info('Please, enter a query to search');
+    cleanGallery();
     return;
   }
-  queryToFetch = query;
-  galleryEl.innerHTML = '';
-  pageToFetch = 1;
-  buttonLoadMore.classList.add('unvisible');
-  getImages(queryToFetch, pageToFetch);
-  formEl.reset();
+  try {
+    const data = await searchImg(page, searchQuery);
+    const pictures = data.hits;
+    pagesAmount = Math.ceil(data.totalHits / 40);
+    if (pictures.length === 0) {
+      nothingFound();
+    } else {
+      //   if (page === 1) {
+      //     Notify.success(`Hooray! We found ${data.totalHits} images.`);
+      //   }
+      if (pagesAmount > 1) {
+        makeBtnVisible();
+      }
+      const galleryMarkup = createMarkup(pictures);
+      gallery.innerHTML = galleryMarkup;
+
+      page += 1;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+//-----------------------------
+
+async function onBtnLoadMoreClick() {
+  try {
+    let searchQuery = input.value.trim();
+    if (!searchQuery || !page) {
+      return;
+    }
+    // if (page === pagesAmount) {
+    //   hideBtn();
+    // }
+    if (page > 1 && page > pagesAmount) {
+      Notify.info("We're sorry, but you've reached the end of search results.");
+      hideBtn();
+    } else {
+      showLoader();
+      const data = await searchImg(page, searchQuery);
+      const pictures = data.hits;
+      page += 1;
+      const galleryMarkup = createMarkup(pictures);
+      gallery.insertAdjacentHTML('beforeend', galleryMarkup);
+      hideLoader();
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-//Функція-хендлер, що рендерить наступну порцію картинок по кліку на кнопку "Load more"
-function onBtnLoadMoreClick() {
-  buttonLoadMore.classList.add('unvisible');
-  pageToFetch += 1;
-  getImages(queryToFetch, pageToFetch);
+function createMarkup(pictures) {
+  return pictures
+    .map(picture => {
+      return `<div class="photo-card">
+      <a class="photo-card__link" href=${picture.largeImageURL}>
+      <img src=${picture.webformatURL} alt="${picture.tags}" loading="lazy" />
+      </a><div class="info"><p class="info-item"><b>Likes</b> ${picture.likes}</p>
+      <p class="info-item"><b>Views</b> ${picture.views}</p><p class="info-item">
+      <b>Comments</b> ${picture.comments}</p><p class="info-item">
+      <b>Downloads</b> ${picture.downloads}</p>
+      </div></div>`;
+    })
+    .join('');
 }
 
-export { galleryEl, buttonLoadMore, lightbox };
+function cleanGallery() {
+  gallery.innerHTML = '';
+}
 
-// //Functions for scroll
-// function smoothScroll() {
-//   if (gallery.children.length) {
-//     const { height: cardHeight } =
-//       gallery.firstElementChild.getBoundingClientRect();
-//     window.scrollBy({
-//       top: cardHeight * 2,
-//       behavior: 'smooth',
-//     });
-//   }
-// }
+function nothingFound() {
+  cleanGallery();
+  Notify.failure(
+    'Sorry, there are no images matching your search query. Please try again.'
+  );
+  page = 1;
+  hideBtn();
+}
 
-// async function checkPosition() {
-//   const height = document.body.offsetHeight;
-//   const screenHeight = window.innerHeight;
-//   const scrolled = window.scrollY;
-//   const threshold = height - screenHeight / 4;
-//   const position = scrolled + screenHeight;
-//   if (position >= threshold) {
-//     await loadMoreImg();
-//   }
-// }
+// Functions for "Load More Btn"
+function makeBtnVisible() {
+  loadMoreBtn.classList.remove('is-hidden');
+}
+
+function hideBtn() {
+  if (!loadMoreBtn.classList.contains('is-hidden')) {
+    loadMoreBtn.classList.add('is-hidden');
+  }
+}
+
+// Functions for loader
+function showLoader() {
+  document.querySelector('.loader').classList.remove('is-hidden');
+}
+
+function hideLoader() {
+  document.querySelector('.loader').classList.add('is-hidden');
+}
